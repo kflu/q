@@ -31,13 +31,13 @@ TODO
 ;; Base url of the API
 (define BASEURL (string->url "https://slack.com/api/chat.postMessage"))
 
-(struct config (token) #:prefab)
-
 ;; Get config object (currently just a token string)
 (define (get-config)
   (let* ([homedir (find-system-path 'home-dir)]
          [rc (build-path homedir ".qrc")])
     (call-with-input-file rc read)))
+
+(define (get-token config) (hash-ref config 'token))
 
 ;; Add parameters to the URL
 (define (add-params url_ params)
@@ -51,6 +51,7 @@ TODO
                     [text . ,text])))
 
 (let* ([config (get-config)]
-       [token (config-token config)]
+       [token (get-token config)]
        [api-url (make-url BASEURL token (cmdline-channel cmdline-config) (cmdline-msg cmdline-config))])
+  (if (cmdline-verbose cmdline-config) (displayln config) (void))
   (http-sendrecv/url api-url))
