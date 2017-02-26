@@ -21,9 +21,7 @@ TODO
      #:once-each
      [("-c" "--channel") ch "slack channel to post (default: use .qrc setting or default)" (channel ch)]
      [("-v" "--verbose") "verbose mode" (verbose #t)]
-     #:usage-help #<<---USAGE---
-
-q - A COMMAND LINE SLACK UTILITY
+     #:ps #<<---USAGE---
 
 A sample `.qrc` file:
 
@@ -44,6 +42,7 @@ A sample `.qrc` file:
 
 ---USAGE---
      #:args (msg)
+     displayln foo
      (cmdline (channel) msg (verbose)))))
 
 (define cmdline-config (parse-cmdline))

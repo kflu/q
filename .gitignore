@@ -2,3 +2,6 @@ compiled/
 *.bak
 *~
 *.swp
+*.exe
+*.zip
+q/
