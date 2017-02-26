@@ -21,6 +21,28 @@ TODO
      #:once-each
      [("-c" "--channel") ch "slack channel to post (default: use .qrc setting or default)" (channel ch)]
      [("-v" "--verbose") "verbose mode" (verbose #t)]
+     #:usage-help #<<---USAGE---
+
+q - A COMMAND LINE SLACK UTILITY
+
+A sample `.qrc` file:
+
+    #hash(
+
+        ; required: bot token
+        (token . "BOT_TOKEN") 
+
+        ; optional: default channel to send, default to #general
+        ; can be overriden by cmdline argument
+        (default-channel . "@someone")
+
+        ; optional: name of the bot
+        (bot-name . "qbot")
+
+    )
+    ; vi: set ft=scheme:
+
+---USAGE---
      #:args (msg)
      (cmdline (channel) msg (verbose)))))
 
