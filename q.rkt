@@ -12,15 +12,16 @@ TODO
 
 (require net/url racket/cmdline)
 
-(struct cmdline (channel msg verbose) #:prefab)
+(define *channel* (make-parameter #f))
+(define *message* (make-parameter #f))
+(define *verbose* (make-parameter #f))
+
 (define (parse-cmdline)
-  (let* ([channel (make-parameter #f)]
-         [verbose (make-parameter #f)])
     (command-line
      #:program "q"
      #:once-each
-     [("-c" "--channel") ch "slack channel to post (default: use .qrc setting or default)" (channel ch)]
-     [("-v" "--verbose") "verbose mode" (verbose #t)]
+     [("-c" "--channel") ch "slack channel to post (default: use .qrc setting or default)" (*channel* ch)]
+     [("-v" "--verbose") "verbose mode" (*verbose* #t)]
      #:ps #<<---USAGE---
 
 A sample `.qrc` file:
@@ -42,17 +43,16 @@ A sample `.qrc` file:
 
 ---USAGE---
      #:args (msg)
-     displayln foo
-     (cmdline (channel) msg (verbose)))))
+     (*message* msg)))
 
-(define cmdline-config (parse-cmdline))
-(if (cmdline-verbose cmdline-config) (displayln cmdline-config) (void))
+(parse-cmdline)
+(if (*verbose*) (displayln (list (*channel*) (*verbose*) (*message*))) (void))
 
 
 ;; Base url of the API
 (define BASEURL (string->url "https://slack.com/api/chat.postMessage"))
 
-;; Get config object (currently just a token string)
+;; Get config object
 (define (get-config)
   (let* ([homedir (find-system-path 'home-dir)]
          [rc (build-path homedir ".qrc")])
@@ -76,8 +76,8 @@ A sample `.qrc` file:
 
 (let* ([config (get-config)]
        [token (get-token config)]
-       [channel (or (cmdline-channel cmdline-config) (get-default-channel config))]
+       [channel (or (*channel*) (get-default-channel config))]
        [botname (get-bot-name config)]
-       [api-url (make-url BASEURL token channel botname (cmdline-msg cmdline-config))])
-  (if (cmdline-verbose cmdline-config) (displayln config) (void))
+       [api-url (make-url BASEURL token channel botname (*message*))])
+  (if (*verbose*) (displayln config) (void))
   (http-sendrecv/url api-url))
