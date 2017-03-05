@@ -42,7 +42,7 @@ USAGE
 
 Run a command, wait for it to finish, and send a message:
     
-    make; q "hello world!"
+    make; q "make is done!"
 
 Run a command, wait for it to finish, and send its stdout and stderr:
 
