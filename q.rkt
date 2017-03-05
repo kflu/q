@@ -17,6 +17,16 @@ TODO
 (define *verbose* (make-parameter #f))
 (define *exec* (make-parameter #f))
 
+(define *exec-mode-fmt* #<<---EOD---
+EXECUTION OF:
+~a
+STDOUT:
+~a
+STDERR:
+~a
+---EOD---
+)
+
 (define (parse-cmdline)
     (command-line
      #:program "q"
@@ -30,13 +40,13 @@ TODO
 USAGE
 -----
 
-Send a message:
+Run a command, wait for it to finish, and send a message:
     
-    q "hello world!"
+    make; q "hello world!"
 
-Execute a command and send its sdtout and stderr:
+Run a command, wait for it to finish, and send its stdout and stderr:
 
-    q -x ls -l
+    q -x make
 
 
 ------------------
@@ -95,11 +105,12 @@ SAMPLE `.qrc` FILE
        [token (get-token config)]
        [channel (or (*channel*) (get-default-channel config))]
        [botname (get-bot-name config)])
+  
   (if (*verbose*) (displayln config) (void))
   (define msg 
     (if (*exec*)
         (let-values ([(stdout stderr) (execute (*message*))])
-          (format "STDOUT:\r~a\rSTDERR:\r~a" stdout stderr))
-        (string-join (flatten (*message*)))))
+          (format *exec-mode-fmt* (string-join (*message*)) stdout stderr))
+        (string-join (*message*))))
   (define api-url (make-url BASEURL token channel botname msg))
   (http-sendrecv/url api-url))
