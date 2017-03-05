@@ -26,22 +26,37 @@ TODO
      [("-x" "--execute") "execute command" (*exec* #t)]
      #:ps #<<---USAGE---
 
-A sample `.qrc` file:
+-----
+USAGE
+-----
 
-    #hash(
+Send a message:
+    
+    q "hello world!"
 
-        ; required: bot token
-        (token . "BOT_TOKEN") 
+Execute a command and send its sdtout and stderr:
 
-        ; optional: default channel to send, default to #general
-        ; can be overriden by cmdline argument
-        (default-channel . "@someone")
+    q -x ls -l
 
-        ; optional: name of the bot
-        (bot-name . "qbot")
 
-    )
-    ; vi: set ft=scheme:
+------------------
+SAMPLE `.qrc` FILE
+------------------
+
+#hash(
+
+    ; required: bot token
+    (token . "BOT_TOKEN") 
+
+    ; optional: default channel to send, default to #general
+    ; can be overriden by cmdline argument
+    (default-channel . "@someone")
+
+    ; optional: name of the bot
+    (bot-name . "qbot")
+
+)
+; vi: set ft=scheme:
 
 ---USAGE---
      #:args msg
