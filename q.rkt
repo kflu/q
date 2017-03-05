@@ -9,12 +9,13 @@ TODO
 |#
 
 #lang racket/base
-
-(require net/url racket/cmdline)
+(require errortrace)
+(require net/url racket/cmdline racket/format racket/list racket/string "executor.rkt")
 
 (define *channel* (make-parameter #f))
 (define *message* (make-parameter #f))
 (define *verbose* (make-parameter #f))
+(define *exec* (make-parameter #f))
 
 (define (parse-cmdline)
     (command-line
@@ -22,6 +23,7 @@ TODO
      #:once-each
      [("-c" "--channel") ch "slack channel to post (default: use .qrc setting or default)" (*channel* ch)]
      [("-v" "--verbose") "verbose mode" (*verbose* #t)]
+     [("-x" "--execute") "execute command" (*exec* #t)]
      #:ps #<<---USAGE---
 
 A sample `.qrc` file:
@@ -42,7 +44,7 @@ A sample `.qrc` file:
     ; vi: set ft=scheme:
 
 ---USAGE---
-     #:args (msg)
+     #:args msg
      (*message* msg)))
 
 (parse-cmdline)
@@ -77,7 +79,12 @@ A sample `.qrc` file:
 (let* ([config (get-config)]
        [token (get-token config)]
        [channel (or (*channel*) (get-default-channel config))]
-       [botname (get-bot-name config)]
-       [api-url (make-url BASEURL token channel botname (*message*))])
+       [botname (get-bot-name config)])
   (if (*verbose*) (displayln config) (void))
+  (define msg 
+    (if (*exec*)
+        (let-values ([(stdout stderr) (execute (*message*))])
+          (format "STDOUT:\r~a\rSTDERR:\r~a" stdout stderr))
+        (string-join (flatten (*message*)))))
+  (define api-url (make-url BASEURL token channel botname msg))
   (http-sendrecv/url api-url))
