@@ -1,10 +1,14 @@
-#lang racket/base
+#lang typed/racket/base
 
 (require racket/string racket/list racket/match racket/system racket/port racket/function)
 (provide execute)
 
+(: execute (-> String (Listof String) (Pairof String String)))
 (define (execute cmd . args)
-  (define cmdln (string-join (flatten `(,cmd ,args))))
+  (define cmdln 
+    (string-join 
+      (cast (flatten `(,cmd ,args)) (Listof String))))
+
   (displayln (format "running ~a" cmdln))
   (match (process cmdln)
     [(list out in pid err f)
@@ -24,7 +28,7 @@
          (displayln (f 'status))
          (f 'wait)
        
-         (values (get-output-string buf_stdout) (get-output-string buf_stderr))))
+         (cons (get-output-string buf_stdout) (get-output-string buf_stderr))))
       
       (thunk (custodian-shutdown-all cust)))
      ]))
